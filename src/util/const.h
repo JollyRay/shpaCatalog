@@ -8,4 +8,9 @@ std::string startModelMessage = "brand_name,model_name,best_price,screen_size,re
 std::string userResource = "resources/user.csv";
 std::string startUserMessage = "login,password,roly\nroot,root,1\n";
 
+std::string helloMessage = "Hello, please enter your login and password";
+
+std::string commanHelpMessage = "Сommon сommand List:\n\tshow - show all phons\n\tfind - looking for phon on param\n\tsort - sort phon's list\n\texit - exit\n";
+std::string managerHelpMessage = "Manager сommand List:\n\tadd - add new phone\n\tremove - add new phone\n\taddUser - add new user\n\tremoveUser - add new user\n\tshowUser - show all user\n";
+
 #endif

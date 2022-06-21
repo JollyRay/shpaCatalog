@@ -36,7 +36,11 @@ void ComandWorker::logining(){
     }
 }
 
-void ComandWorker::execute(){
+void ComandWorker::execute(std::string *userMessage, std::string *managerMessage){
+    std::cout << *userMessage << std::endl;
+    if (self->getRoly()){
+        std::cout << *managerMessage << std::endl;
+    }
     while(1){
         std::cout << "-->";
         std::string command; 
@@ -56,9 +60,9 @@ void ComandWorker::execute(){
     }
 }
 
-void ComandWorker::init(){
+void ComandWorker::init(std::string *userMessage, std::string *managerMessage){
     this->logining();
-    this->execute();
+    this->execute(userMessage, managerMessage);
 }
 
 void ComandWorker::addUser(){
@@ -119,6 +123,7 @@ void ComandWorker::addPhone(){
     std::cout << "model: ";
     std::cin >> model;
     while(1){
+        std::cout << "Price: ";
         if (std::cin >> price){
             break;
         } else {
@@ -126,6 +131,7 @@ void ComandWorker::addPhone(){
         }
     }
     while(1){
+        std::cout << "Screen: ";
         if (std::cin >> screenSize){
             break;
         } else {
@@ -133,6 +139,7 @@ void ComandWorker::addPhone(){
         }
     }
     while(1){
+        std::cout << "month: ";
         if (std::cin >> month){
             break;
         } else {
@@ -140,6 +147,7 @@ void ComandWorker::addPhone(){
         }
     }
     while(1){
+        std::cout << "Year: ";
         if (std::cin >> year){
             break;
         } else {
@@ -147,8 +155,10 @@ void ComandWorker::addPhone(){
         }
     }
     while(1){
+        std::cout << "Sim: ";
         if (std::cin >> sim2){
             phons->add(new Phone(brand, model, price, screenSize, month, year, sim2));
+            return;
         } else {
             std::cout << "Uncorrect year" << std::endl;
         }
@@ -172,20 +182,8 @@ void ComandWorker::removePhone(){
     }
 }
 
-int selectType(){
-    int columnNumber;
-    while(1){
-        std::cout << chooseSorterMassege;
-        if (std::cin >> columnNumber && columnNumber > 0 && columnNumber < 7){
-            return columnNumber;
-        } else {
-            std::cout << "Uncorrect sorter" << std::endl;
-        }
-    }
-}
-
 void ComandWorker::sort(){
-    switch (selectType()){
+    switch (selectType(chooseSorterMassege)){
     case comandType::sortBrandNumber:
         phons->sort(&compareBrand);
         return;
@@ -233,42 +231,36 @@ void ComandWorker::showUser(){
 }
 
 void ComandWorker::find(){
-    int columnNumber = selectType();
-    int counter = 0;
-    std::string keyWord;
-    std::cout << "Key Word: ";
-    std::cin >> keyWord;
-    keyWord = trim(keyWord);
+    std::cin.ignore(1000,'\n');
+    std::string modelPattern, brandPattern;
+    float pricePattern, screenPattern;
+    int yearPattern, monthPattern;
+    int simPattern;
 
+    modelPattern = collectString(modelRequast);
+    brandPattern = collectString(brandRequast);
+    pricePattern = collectFloat(priceRequast);
+    screenPattern = collectFloat(screenSizeRequast);
+    yearPattern = collectInt(yearRequast);
+    monthPattern = collectInt(monthRequast);
+    simPattern = collectInt(simRequast);
+
+    int counter = 0;
     auto data = phons->getData();
     auto ptr = data.begin();
+
     while(ptr != data.end()){
-        switch (columnNumber){
-        case comandType::sortBrandNumber:
-            if ((*ptr)->getBrand().find(keyWord) != -1){
-                std::cout << (*ptr)->toString();
-                counter++;
-            };
-            break;
-        case comandType::sortModelNumber:
-            if ((*ptr)->getModel().find(keyWord) != -1){
-                std::cout << (*ptr)->toString();
-                counter++;
-            };
-            break;
-        case comandType::sortPriceNumber:
-            try{
-                if (abs((*ptr)->getPrice() - std::stof(keyWord)) < 0.01){
-                    std::cout << (*ptr)->toString();
-                    counter++;
-                }
-            } catch(...) {
-                return;
-            }
-            break;
-        default:
-            std::cout << "Uncorrect sorter" << std::endl;
-            break;
+        if (
+            ( (*ptr)->getBrand().find(modelPattern) != -1 || trim(modelPattern).length() == 0) &&
+            ( (*ptr)->getModel().find(brandPattern) != -1 || trim(brandPattern).length() == 0) &&
+            ( abs((*ptr)->getPrice()-pricePattern) < 0.01 || pricePattern < 0) &&
+            ( abs((*ptr)->getScreenSize()-screenPattern) < 0.01 || screenPattern < 0) &&
+            ( (*ptr)->getMonth() == monthPattern || monthPattern < 0) &&
+            ( (*ptr)->getYear() == yearPattern || yearPattern < 0) &&
+            ( (*ptr)->getSim() == simPattern || simPattern < 0)
+        ){
+            std::cout << (*ptr)->toString();
+            counter++;
         }
         ptr++;
     }
